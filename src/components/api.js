@@ -1,5 +1,3 @@
-import { profDescription, profTitle, profImage, cardImage, cardTitle, cardNumbersLike, openAvatar } from './constants'
-
 const config = {
   baseUrl: 'https://nomoreparties.co/v1/wff-cohort-2',
   headers: {
@@ -7,6 +5,41 @@ const config = {
     'Content-Type': 'application/json'
   }
 };
+
+export function fetchData(url, method, body) {
+  const options = {
+    method: method,
+    headers: config.headers
+  };
+
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  return fetch(`${config.baseUrl}${url}`, options)
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    });
+}
+
+export function getProfile() {
+  return fetch(`${config.baseUrl}/users/me`, {
+    method: 'GET',
+    headers: config.headers,
+  })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      }
+      return Promise.reject(`Ошибка: ${res.status}`);
+    })
+    .then(result =>{
+      return result._id
+    })
+}
 
 export function initialProfile() {
   return fetch(`${config.baseUrl}/users/me`, {
@@ -22,12 +55,6 @@ export function initialProfile() {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((result) => {
-      profTitle.textContent = result.name;
-      profDescription.textContent = result.about;
-      profImage.style.backgroundImage = result.avatar;
-      return result._id;
     });
 }
 
@@ -41,9 +68,6 @@ export function initialCards() {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((data) => {
-      return data;
     });
 };
 
@@ -87,12 +111,6 @@ export function activeApiLike(cardId) {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((data) => {
-      const likes = JSON.parse(localStorage.getItem('likes')) || {};
-      likes[cardId] = true;
-      localStorage.setItem('likes', JSON.stringify(likes));
-      return data;
     });
 }
 
@@ -106,12 +124,6 @@ export function deleteApiLike(cardId) {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((data) => {
-      const likes = JSON.parse(localStorage.getItem('likes')) || {};
-      delete likes[cardId];
-      localStorage.setItem('likes', JSON.stringify(likes));
-      return data;
     });
 }
 
@@ -128,8 +140,5 @@ export function updateAvatar(avatarUrl) {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
-    })
-    .then((data) => {
-      openAvatar.style.backgroundImage = `url(${avatarUrl})`;
     });
 }

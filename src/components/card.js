@@ -1,4 +1,4 @@
-import { initialCards, initialProfile, deleteApiCard, activeApiLike, deleteApiLike } from './api'
+import { initialCards, getProfile, deleteApiCard, activeApiLike, deleteApiLike, fetchData } from './api'
 import { cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
 import { openModal, closeModal } from './modal'
 
@@ -44,18 +44,32 @@ export function createCard(name, link, likes, likeProc, openImagePopup, cardId) 
 function deleteButtonWork(card, cardId) {
   const deleteButton = card.querySelector('.card__delete-button');
   deleteButton.addEventListener('click', function () {
+    buttonConfirm.setAttribute('data-card-id', cardId);
     openModal(popupConfirm);
-    deleteApiCard(cardId);
   });
 }
 
-function deleteCard(){
-  buttonConfirm.textContent = 'Удаляем...'
-  setTimeout(function () {
-    buttonConfirm.textContent = 'Да'
-    closeModal(popupConfirm);
-    location.reload();
-  }, 1000)
+buttonConfirm.addEventListener('click', function () {
+  const cardId = buttonConfirm.getAttribute('data-card-id');
+  if (cardId) {
+    deleteCard(cardId);
+  } else {
+    console.error('Не удалось получить ID карты для удаления.');
+  }
+});
+
+function deleteCard(cardId) {
+  Promise.resolve()
+    .then(() => deleteApiCard(cardId))
+    .then(response => {
+      closeModal(popupConfirm);
+    })
+    .catch(error => {
+      console.error('Ошибка при удалении карты:', error);
+    })
+    .finally(() => {
+      buttonConfirm.textContent = 'Да';
+    });
 }
 
 buttonConfirm.addEventListener('click', deleteCard)
@@ -66,7 +80,7 @@ function deleteButtonHide(card) {
 }
 
 export function renderCards(cards) {
-  initialProfile()
+  getProfile()
     .then(resultID => {
       cards.forEach(card => {
         const newCard = createCard(card.name, card.link, card.likes, toggleLike, openImagePopup, card._id);

@@ -17,7 +17,7 @@ const deleteButton = document.querySelector('.card__delete-button');
 const editButton = document.querySelector('.profile__edit-button');
 const addButton = document.querySelector('.profile__add-button');
 const popupImage = document.querySelector('.popup_type_image');
-const savePopupAvatar = popupAvatar.querySelector('.popup__button')
+const buttonSubmitAvatarForm = popupAvatar.querySelector('.popup__button')
 const closeButtonPopupEdit = popupEdit.querySelector('.popup__close');
 const closeButtonPopupAdd = popupAdd.querySelector('.popup__close');
 const closeButtonPopupImage = popupImage.querySelector('.popup__close');
@@ -34,5 +34,7 @@ const openAvatar = document.querySelector('.profile__image');
 const avatarInput = popupAvatar.querySelector('.popup__input_avatar');
 const avatarError = popupAvatar.querySelector('.pop-up__error-message');
 const avatarSaveButton = document.getElementById('button-avatar-save');
+const inputElement = document.querySelector('.pop-up__input');
 
-export { avatarSaveButton, avatarError, avatarInput, savePopupAvatar, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}
+
+export { inputElement, avatarSaveButton, avatarError, avatarInput, buttonSubmitAvatarForm, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}
