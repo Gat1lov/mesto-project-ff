@@ -36,19 +36,13 @@ export function getProfile() {
       }
       return Promise.reject(`Ошибка: ${res.status}`);
     })
-    .then(result =>{
-      return result._id
-    })
 }
 
-export function initialProfile() {
+export function initialProfile(profileData) {
   return fetch(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
     headers: config.headers,
-    body: JSON.stringify({
-      name: 'Жак-Ив Кусто',
-      about: 'Эксперт по океанам'
-    })
+    body: JSON.stringify(profileData)
   })
     .then(res => {
       if (res.ok) {
@@ -140,5 +134,16 @@ export function updateAvatar(avatarUrl) {
         return res.json();
       }
       return Promise.reject(`Ошибка: ${res.status}`);
+    });
+}
+
+export function loadProfileAndCards() {
+  return Promise.all([getProfile(), initialCards()])
+    .then(([profile, cards]) => {
+      return { profile, cards };
+    })
+    .catch((error) => {
+      console.error('Ошибка при загрузке профиля и карточек:', error);
+      throw error;
     });
 }

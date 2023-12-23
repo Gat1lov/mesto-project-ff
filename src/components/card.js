@@ -1,28 +1,16 @@
+import { openImagePopup, userId} from '../index'
 import { initialCards, getProfile, deleteApiCard, activeApiLike, deleteApiLike, fetchData } from './api'
-import { cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
+import { cardTemplate, popupImageCaption, cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
 import { openModal, closeModal } from './modal'
 
-const popupImageCaption = document.querySelector('.popup__caption');
-const cardTemplate = document.querySelector('#card-template');
-
-export function openImagePopup(name, link) {
-  const popupImage = document.querySelector('.popup_type_image');
-  const popupImageElement = popupImage.querySelector('.popup__image');
-
-  popupImageElement.src = link;
-  popupImageElement.setAttribute('alt', name);
-  popupImageCaption.textContent = name;
-
-  openModal(popupImage);
-}
-
-
-export function createCard(name, link, likes, likeProc, openImagePopup, cardId) {
+export function createCard(name, link, likes, likeProc, openImagePopup, cardId, ownerId) {
   const card = cardTemplate.content.querySelector('.card').cloneNode(true);
   const cardTitle = card.querySelector('.card__title');
   const cardImage = card.querySelector('.card__image');
   const likeButton = card.querySelector('.card__like-button');
   const cardNumbersLike = card.querySelector('.card__like-numbers');
+  const deleteButton = card.querySelector('.card__delete-button');
+
 
   cardTitle.textContent = name;
   cardImage.src = link;
@@ -34,31 +22,30 @@ export function createCard(name, link, likes, likeProc, openImagePopup, cardId) 
     likeProc(likeButton, cardId);
   });
 
+  deleteButton.addEventListener('click', function () {
+   deleteButtonWork(card, cardId);
+   openModal(popupConfirm); 
+  })
+
   cardImage.addEventListener('click', function () {
-    openImagePopup(name, link);
+    openImagePopup(name, link, card);
   });
+  
+  if (ownerId === userId) {
+    deleteButtonWork(card, cardId);
+  } else {
+    deleteButtonHide(card);
+  }
 
   return card;
 };
 
-function deleteButtonWork(card, cardId) {
-  const deleteButton = card.querySelector('.card__delete-button');
-  deleteButton.addEventListener('click', function () {
+export function deleteButtonWork(card, cardId) { 
     buttonConfirm.setAttribute('data-card-id', cardId);
-    openModal(popupConfirm);
-  });
-}
+};
 
-buttonConfirm.addEventListener('click', function () {
-  const cardId = buttonConfirm.getAttribute('data-card-id');
-  if (cardId) {
-    deleteCard(cardId);
-  } else {
-    console.error('Не удалось получить ID карты для удаления.');
-  }
-});
-
-function deleteCard(cardId) {
+export function deleteCard(cardId) {
+  buttonConfirm.textContent = 'Удаление...';
   Promise.resolve()
     .then(() => deleteApiCard(cardId))
     .then(response => {
@@ -74,36 +61,9 @@ function deleteCard(cardId) {
 
 buttonConfirm.addEventListener('click', deleteCard)
 
-function deleteButtonHide(card) {
+export function deleteButtonHide(card) {
   const deleteButton = card.querySelector('.card__delete-button');
   deleteButton.style.display = 'none';
-}
-
-export function renderCards(cards) {
-  getProfile()
-    .then(resultID => {
-      cards.forEach(card => {
-        const newCard = createCard(card.name, card.link, card.likes, toggleLike, openImagePopup, card._id);
-        const ownerID = card.owner._id;
-
-        if (resultID === ownerID) {
-          deleteButtonWork(newCard, card._id);
-        } else {
-          deleteButtonHide(newCard);
-        }
-
-        const likes = JSON.parse(localStorage.getItem('likes')) || {};
-        if (likes[card._id]) {
-          const likeButton = newCard.querySelector('.card__like-button');
-          likeButton.classList.add('card__like-button_is-active');
-        }
-
-        cardsContainer.appendChild(newCard);
-      });
-    })
-    .catch(error => {
-      console.error('Error rendering cards:', error);
-    });
 }
 
 export function toggleLike(likeButton, cardId) {
@@ -117,6 +77,9 @@ export function toggleLike(likeButton, cardId) {
         const currentLikes = parseInt(cardNumbersLike.textContent, 10);
         cardNumbersLike.textContent = currentLikes - 1;
       })
+      .catch((error) => {
+        console.error('Ошибка при удалении лайка:', error);
+      });
   } else {
     activeApiLike(cardId)
       .then(() => {
@@ -124,13 +87,8 @@ export function toggleLike(likeButton, cardId) {
         const currentLikes = parseInt(cardNumbersLike.textContent, 10);
         cardNumbersLike.textContent = currentLikes + 1;
       })
+      .catch((error) => {
+        console.error('Ошибка при добавлении лайка:', error);
+      });
   }
 }
-
-initialCards()
-  .then(cards => {
-    renderCards(cards);
-  })
-  .catch(error => {
-    console.log(error);
-  });

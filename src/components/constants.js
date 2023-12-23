@@ -1,3 +1,5 @@
+const popupImageCaption = document.querySelector('.popup__caption');
+const cardTemplate = document.querySelector('#card-template');
 const popupEdit = document.querySelector('.popup_type_edit');
 const nameInput = document.querySelector('.popup__input_type_name');
 const popupConfirm = document.querySelector('.popup_type_confirm');
@@ -35,6 +37,9 @@ const avatarInput = popupAvatar.querySelector('.popup__input_avatar');
 const avatarError = popupAvatar.querySelector('.pop-up__error-message');
 const avatarSaveButton = document.getElementById('button-avatar-save');
 const inputElement = document.querySelector('.pop-up__input');
+const popupImageElement = popupImage.querySelector('.popup__image');
+const placeName = formAdd.querySelector('.popup__input_type_card-name')
+const imageUrl = formAdd.querySelector('.popup__input_type_url')
 
 
-export { inputElement, avatarSaveButton, avatarError, avatarInput, buttonSubmitAvatarForm, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}
+export {imageUrl, placeName, popupImageElement, cardTemplate, popupImageCaption, inputElement, avatarSaveButton, avatarError, avatarInput, buttonSubmitAvatarForm, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}
