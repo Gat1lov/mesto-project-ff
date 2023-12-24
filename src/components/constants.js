@@ -19,6 +19,7 @@ const deleteButton = document.querySelector('.card__delete-button');
 const editButton = document.querySelector('.profile__edit-button');
 const addButton = document.querySelector('.profile__add-button');
 const popupImage = document.querySelector('.popup_type_image');
+const formAvatar = document.getElementById('avatar')
 const buttonSubmitAvatarForm = popupAvatar.querySelector('.popup__button')
 const closeButtonPopupEdit = popupEdit.querySelector('.popup__close');
 const closeButtonPopupAdd = popupAdd.querySelector('.popup__close');
@@ -42,4 +43,4 @@ const placeName = formAdd.querySelector('.popup__input_type_card-name')
 const imageUrl = formAdd.querySelector('.popup__input_type_url')
 
 
-export {imageUrl, placeName, popupImageElement, cardTemplate, popupImageCaption, inputElement, avatarSaveButton, avatarError, avatarInput, buttonSubmitAvatarForm, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}
+export {formAvatar, imageUrl, placeName, popupImageElement, cardTemplate, popupImageCaption, inputElement, avatarSaveButton, avatarError, avatarInput, buttonSubmitAvatarForm, openAvatar, closeButtonPopupAvatar, popupAvatar, buttonConfirm, closeButtonPopupConfirm, deleteButton, popupConfirm, cardImage, cardTitle, profDescription, profTitle, profImage, addButtonSave, nameAddInput, urlInput, editButtonSave, popupEdit, nameInput, nameOutput, jobInput, jobOutput, formEdit, popupAdd, formAdd, cardsContainer, cards, editButton, addButton, popupImage, closeButtonPopupEdit, closeButtonPopupAdd, closeButtonPopupImage}

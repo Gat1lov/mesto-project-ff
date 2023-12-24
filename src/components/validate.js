@@ -18,23 +18,26 @@ export function enableValidation(settings) {
   }
   
 
-  function checkInputValidity(form, input) {
-    const allowedCharactersRegex = /^[a-zA-Zа-яА-ЯёЁ\s-]*$/;
+function checkInputValidity(form, input) {
+  const allowedCharactersRegex = /^[a-zA-Zа-яА-ЯёЁ\s-]*$/;
+  const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
   
-    if (!input.validity.valid) {
-      showInputError(form, input);
-    } else if (!input.value.trim()) {
-      hideInputError(form, input);
-    } else if (!allowedCharactersRegex.test(input.value)) {
-      input.setCustomValidity('Пожалуйста, используйте только латинские и кириллические буквы, знаки дефиса и пробелы');
-      showInputError(form, input);
-    } else {
-      console.log('ебать ошибка')
-      input.setCustomValidity('');
-      hideInputError(form, input);
-    }
+  input.setCustomValidity('')
+  if (!input.validity.valid) {
+    showInputError(form, input);
+  } else if (!input.value.trim()) {
+    hideInputError(form, input);
+  } else if (urlRegex.test(input.value)) {
+    input.setCustomValidity('');
+    hideInputError(form, input);
+  } else if (!allowedCharactersRegex.test(input.value)) {
+    input.setCustomValidity('Пожалуйста, используйте только латинские и кириллические буквы, знаки дефиса и пробелы');
+    showInputError(form, input);
+  } else {
+    input.setCustomValidity('');
+    hideInputError(form, input);
   }
-
+}
   function toggleButtonState(form, button) {
     button.disabled = !form.checkValidity();
     if (button.disabled) {

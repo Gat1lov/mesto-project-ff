@@ -3,7 +3,7 @@ import { initialCards, getProfile, deleteApiCard, activeApiLike, deleteApiLike, 
 import { cardTemplate, popupImageCaption, cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
 import { openModal, closeModal } from './modal'
 
-export function createCard(name, link, likes, likeProc, openImagePopup, cardId, ownerId) {
+export function createCard(name, link, cardLikes, likeProc, openImagePopup, cardId, ownerId) {
   const card = cardTemplate.content.querySelector('.card').cloneNode(true);
   const cardTitle = card.querySelector('.card__title');
   const cardImage = card.querySelector('.card__image');
@@ -11,12 +11,17 @@ export function createCard(name, link, likes, likeProc, openImagePopup, cardId, 
   const cardNumbersLike = card.querySelector('.card__like-numbers');
   const deleteButton = card.querySelector('.card__delete-button');
 
+  const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
+  if (likesFromLocalStorage[cardId]) {
+    const likeButton = card.querySelector('.card__like-button');
+    likeButton.classList.add('card__like-button_is-active');
+  }
 
   cardTitle.textContent = name;
   cardImage.src = link;
   cardImage.alt = name;
 
-  cardNumbersLike.textContent = likes.length;
+  cardNumbersLike.textContent = cardLikes.length;
 
   likeButton.addEventListener('click', function () {
     likeProc(likeButton, cardId);
@@ -76,6 +81,10 @@ export function toggleLike(likeButton, cardId) {
         likeButton.classList.remove('card__like-button_is-active');
         const currentLikes = parseInt(cardNumbersLike.textContent, 10);
         cardNumbersLike.textContent = currentLikes - 1;
+
+        const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
+        likesFromLocalStorage[cardId] = false;
+        localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));
       })
       .catch((error) => {
         console.error('Ошибка при удалении лайка:', error);
@@ -86,6 +95,10 @@ export function toggleLike(likeButton, cardId) {
         likeButton.classList.add('card__like-button_is-active');
         const currentLikes = parseInt(cardNumbersLike.textContent, 10);
         cardNumbersLike.textContent = currentLikes + 1;
+
+        const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
+        likesFromLocalStorage[cardId] = true;
+        localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));
       })
       .catch((error) => {
         console.error('Ошибка при добавлении лайка:', error);

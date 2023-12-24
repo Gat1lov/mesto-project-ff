@@ -38,7 +38,7 @@ export function getProfile() {
     })
 }
 
-export function initialProfile(profileData) {
+export function updateProfile(profileData) {
   return fetch(`${config.baseUrl}/users/me`, {
     method: 'PATCH',
     headers: config.headers,
@@ -121,12 +121,12 @@ export function deleteApiLike(cardId) {
     });
 }
 
-export function updateAvatar(avatarUrl) {
+export function updateAvatar(newAvatarUrl) {
   return fetch(`${config.baseUrl}/users/me/avatar`, {
     method: 'PATCH',
     headers: config.headers,
     body: JSON.stringify({
-      avatar: avatarUrl
+      avatar: newAvatarUrl
     })
   })
     .then((res) => {
