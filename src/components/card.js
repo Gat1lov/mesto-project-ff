@@ -1,9 +1,8 @@
-import { openImagePopup, userId} from '../index'
 import { initialCards, getProfile, deleteApiCard, activeApiLike, deleteApiLike, fetchData } from './api'
 import { cardTemplate, popupImageCaption, cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
 import { openModal, closeModal } from './modal'
 
-export function createCard(name, link, cardLikes, likeProc, openImagePopup, cardId, ownerId) {
+export function createCard(name, link, cardLikes, likeProc, openImagePopup, cardId, ownerId, userId) {
   const card = cardTemplate.content.querySelector('.card').cloneNode(true);
   const cardTitle = card.querySelector('.card__title');
   const cardImage = card.querySelector('.card__image');
@@ -27,15 +26,20 @@ export function createCard(name, link, cardLikes, likeProc, openImagePopup, card
     likeProc(likeButton, cardId);
   });
 
-  deleteButton.addEventListener('click', function () {
-   deleteButtonWork(card, cardId);
-   openModal(popupConfirm); 
-  })
+  deleteButton.addEventListener('click', function() {
+    deleteButtonWork(cardId);
+    openModal(popupConfirm);
+    
+    buttonConfirm.addEventListener('click', function confirmDelete() {
+      deleteCard(card, cardId);
+      buttonConfirm.removeEventListener('click', confirmDelete); 
+    });
+  });
 
   cardImage.addEventListener('click', function () {
     openImagePopup(name, link, card);
   });
-  
+
   if (ownerId === userId) {
     deleteButtonWork(card, cardId);
   } else {
@@ -45,15 +49,20 @@ export function createCard(name, link, cardLikes, likeProc, openImagePopup, card
   return card;
 };
 
-export function deleteButtonWork(card, cardId) { 
-    buttonConfirm.setAttribute('data-card-id', cardId);
+export function deleteButtonWork(cardId) {
+  buttonConfirm.setAttribute('data-card-id', cardId);
 };
 
-export function deleteCard(cardId) {
+export function removeCardFromDOM(card) {
+  card.remove();
+}
+
+export function deleteCard(card, cardId) {
   buttonConfirm.textContent = 'Удаление...';
   Promise.resolve()
     .then(() => deleteApiCard(cardId))
     .then(response => {
+      removeCardFromDOM(card);
       closeModal(popupConfirm);
     })
     .catch(error => {
@@ -64,8 +73,6 @@ export function deleteCard(cardId) {
     });
 }
 
-buttonConfirm.addEventListener('click', deleteCard)
-
 export function deleteButtonHide(card) {
   const deleteButton = card.querySelector('.card__delete-button');
   deleteButton.style.display = 'none';
@@ -75,13 +82,17 @@ export function toggleLike(likeButton, cardId) {
   const cardNumbersLike = likeButton.parentElement.querySelector('.card__like-numbers');
   const isLiked = likeButton.classList.contains('card__like-button_is-active');
 
+  const updateLikesCount = (newLikesCount) => {
+    if (cardNumbersLike) {
+      cardNumbersLike.textContent = newLikesCount;
+    }
+  };
+
   if (isLiked) {
     deleteApiLike(cardId)
       .then(() => {
         likeButton.classList.remove('card__like-button_is-active');
-        const currentLikes = parseInt(cardNumbersLike.textContent, 10);
-        cardNumbersLike.textContent = currentLikes - 1;
-
+        updateLikesCount(parseInt(cardNumbersLike.textContent, 10) - 1);
         const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
         likesFromLocalStorage[cardId] = false;
         localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));
@@ -93,9 +104,7 @@ export function toggleLike(likeButton, cardId) {
     activeApiLike(cardId)
       .then(() => {
         likeButton.classList.add('card__like-button_is-active');
-        const currentLikes = parseInt(cardNumbersLike.textContent, 10);
-        cardNumbersLike.textContent = currentLikes + 1;
-
+        updateLikesCount(parseInt(cardNumbersLike.textContent, 10) + 1);
         const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
         likesFromLocalStorage[cardId] = true;
         localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));

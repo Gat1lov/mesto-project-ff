@@ -2,6 +2,10 @@
   font-size: 18px;
   line-height: 22px;
   grid-area: description;
+  max-width: 228px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin: 0;
 }
 

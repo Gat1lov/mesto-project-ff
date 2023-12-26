@@ -15,14 +15,14 @@ const validationConfig = {
 };
 
 enableValidation(validationConfig);
-
-export let userId;
+ 
+let userId;
 
 loadProfileAndCards()
-  .then(({ profile, cards,cardId }) => {
-    userId = profile._id;
+  .then(({ profile, cards, cardId }) => {
+   userId = profile._id;
     renderUserProfile(profile);
-    renderCards(cards);
+    renderCards(cards, userId);
   })
   .catch((error) => {
     console.error('Ошибка:', error);
@@ -74,8 +74,9 @@ function addCardFromForm(event) {
   addButtonSave.textContent = 'Создание...';
 
   createApiCard(cardData)
-    .then((newCard) => {
-      const cardElement = createCard(newCard.name, newCard.link, newCard.likes, toggleLike, openImagePopup, newCard._id, newCard.owner._id);
+    .then(newCard => {
+      const { name, link, likes, _id, owner } = newCard;
+      const cardElement = createCard(name, link, likes, toggleLike, openImagePopup, _id, owner._id, userId);
       cardsContainer.prepend(cardElement);
       closeModal(popupAdd);
     })
@@ -138,12 +139,15 @@ export function openImagePopup(name, link, card) {
   openModal(popupImage);
 }
 
-export function renderCards(cards, cardData) {
-  cards.forEach(card => {
-    const newCard = createCard(card.name, card.link, card.likes, toggleLike, openImagePopup, card._id, card.owner._id);
+export function renderCards(cardsData, userId) {
+  cardsData.forEach(card => {
+    const { name, link, likes, _id, owner } = card;
+    const newCard = createCard(name, link, likes, toggleLike, openImagePopup, _id, owner._id, userId);
+    const cardNumbersLike = newCard.querySelector('.card__like-numbers');
+    cardNumbersLike.textContent = likes.length.toString()
     cardsContainer.appendChild(newCard);
-  });
 
+  });
 }
 
 function openPopupEdit() {
