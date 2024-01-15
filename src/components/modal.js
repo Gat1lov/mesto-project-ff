@@ -4,7 +4,6 @@ import { openAvatar, closeButtonPopupAvatar, popupAvatar, closeButtonPopupConfir
 function closeByClick(event) {
     const modal = event.currentTarget;
     if (event.target === modal) {
-        document.removeEventListener('keydown', closeByEsc);
         closeModal(modal);
     }
 }

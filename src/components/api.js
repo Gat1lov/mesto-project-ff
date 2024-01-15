@@ -1,7 +1,7 @@
 const config = {
-  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-2',
+  baseUrl: 'https://nomoreparties.co/v1/wff-cohort-4',
   headers: {
-    authorization: '3a6a22df-0b86-4e1d-82b6-49402f2e54e3',
+    authorization: 'ed71a921-5af8-4dcc-9841-c1f795ccfb71',
     'Content-Type': 'application/json'
   }
 };
@@ -120,6 +120,7 @@ export function deleteApiLike(cardId) {
       return Promise.reject(`Ошибка: ${res.status}`);
     });
 }
+
 
 export function updateAvatar(newAvatarUrl) {
   return fetch(`${config.baseUrl}/users/me/avatar`, {

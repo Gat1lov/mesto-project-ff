@@ -2,6 +2,8 @@ import { initialCards, getProfile, deleteApiCard, activeApiLike, deleteApiLike, 
 import { cardTemplate, popupImageCaption, cardsContainer, popupConfirm, buttonConfirm, cards } from './constants'
 import { openModal, closeModal } from './modal'
 
+let cardToDelete;
+
 export function createCard(name, link, cardLikes, likeProc, openImagePopup, cardId, ownerId, userId) {
   const card = cardTemplate.content.querySelector('.card').cloneNode(true);
   const cardTitle = card.querySelector('.card__title');
@@ -10,30 +12,23 @@ export function createCard(name, link, cardLikes, likeProc, openImagePopup, card
   const cardNumbersLike = card.querySelector('.card__like-numbers');
   const deleteButton = card.querySelector('.card__delete-button');
 
-  const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
-  if (likesFromLocalStorage[cardId]) {
-    const likeButton = card.querySelector('.card__like-button');
-    likeButton.classList.add('card__like-button_is-active');
-  }
-
   cardTitle.textContent = name;
   cardImage.src = link;
   cardImage.alt = name;
 
+  const userLike = checkLike(cardLikes, userId);
+  updateLike(userLike, likeButton);
+
   cardNumbersLike.textContent = cardLikes.length;
 
   likeButton.addEventListener('click', function () {
-    likeProc(likeButton, cardId);
+    toggleLike(card, userId, likeButton, cardId, cardLikes);
   });
-
-  deleteButton.addEventListener('click', function() {
+  
+  deleteButton.addEventListener('click', function () {
+    cardToDelete = card;
     deleteButtonWork(cardId);
     openModal(popupConfirm);
-    
-    buttonConfirm.addEventListener('click', function confirmDelete() {
-      deleteCard(card, cardId);
-      buttonConfirm.removeEventListener('click', confirmDelete); 
-    });
   });
 
   cardImage.addEventListener('click', function () {
@@ -53,16 +48,12 @@ export function deleteButtonWork(cardId) {
   buttonConfirm.setAttribute('data-card-id', cardId);
 };
 
-export function removeCardFromDOM(card) {
-  card.remove();
-}
-
-export function deleteCard(card, cardId) {
+export function deleteCard(cardId) {
   buttonConfirm.textContent = 'Удаление...';
   Promise.resolve()
     .then(() => deleteApiCard(cardId))
     .then(response => {
-      removeCardFromDOM(card);
+      cardToDelete.remove();
       closeModal(popupConfirm);
     })
     .catch(error => {
@@ -78,39 +69,37 @@ export function deleteButtonHide(card) {
   deleteButton.style.display = 'none';
 }
 
-export function toggleLike(likeButton, cardId) {
+function checkLike(cardLikes, userId) {
+  return cardLikes.some((item) => item._id === userId);
+}
+
+function updateLike(isLiked, likeButton) {
+  if (isLiked) {
+    likeButton.classList.add('card__like-button_is-active');
+  } else {
+    likeButton.classList.remove('card__like-button_is-active');
+  }
+}
+
+export function toggleLike(card, userId, likeButton, cardId, cardLikes) {
   const cardNumbersLike = likeButton.parentElement.querySelector('.card__like-numbers');
   const isLiked = likeButton.classList.contains('card__like-button_is-active');
 
-  const updateLikesCount = (newLikesCount) => {
+  const updateLikesNumber = (newLikeNumber) => {
     if (cardNumbersLike) {
-      cardNumbersLike.textContent = newLikesCount;
+      cardNumbersLike.textContent = newLikeNumber;
     }
   };
+  const editLike = isLiked ? deleteApiLike : activeApiLike;
 
-  if (isLiked) {
-    deleteApiLike(cardId)
-      .then(() => {
-        likeButton.classList.remove('card__like-button_is-active');
-        updateLikesCount(parseInt(cardNumbersLike.textContent, 10) - 1);
-        const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
-        likesFromLocalStorage[cardId] = false;
-        localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));
-      })
-      .catch((error) => {
-        console.error('Ошибка при удалении лайка:', error);
-      });
-  } else {
-    activeApiLike(cardId)
-      .then(() => {
-        likeButton.classList.add('card__like-button_is-active');
-        updateLikesCount(parseInt(cardNumbersLike.textContent, 10) + 1);
-        const likesFromLocalStorage = JSON.parse(localStorage.getItem('likes')) || {};
-        likesFromLocalStorage[cardId] = true;
-        localStorage.setItem('likes', JSON.stringify(likesFromLocalStorage));
-      })
-      .catch((error) => {
-        console.error('Ошибка при добавлении лайка:', error);
-      });
-  }
+  editLike(cardId)
+    .then((response) => {
+      const newLikeNumber = response.likes.length;
+      const userLike = checkLike(response.likes, userId);
+      updateLike(userLike, likeButton);
+      updateLikesNumber(newLikeNumber);
+    })
+    .catch((error) => {
+      console.error(`Ошибка при изменении лайка:`, error);
+    });
 }
